@@ -21,6 +21,7 @@ export class PostCreateComponent implements OnInit {
       title: form.value.title,
       content: form.value.content
     });
+    form.resetForm();
   }
 
 
