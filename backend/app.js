@@ -37,26 +37,26 @@ app.post("/api/posts", (req, res, next) => {
     title: req.body.title,
     content: req.body.content
   });
-  post.save()
-  res.status(201).json({
-    message: "Post added successfully"
-  });
+  post.save().then(createdPost => {
+    res.status(201).json({
+      message: "Post added successfully",
+      postId: createdPost._id
+    });
+  })
 })
 
 app.get("/api/posts", (req, res, next) => {
-  const posts = [
-    {
-      id: "gsdfgdsgf3443",
-      title: 'title 1',
-      content: 'content 1'
-    },
-    {
-      id: "gsdfgdsgf3341",
-      title: 'title 2',
-      content: 'content 2'
-    },
-  ]
-  res.status(200).json(posts);
+  Post.find().then(docs => {
+    res.status(200).json(docs);
+  })
+})
+
+app.delete("/api/posts/:id", (req, res, next) => {
+  Post.deleteOne({ _id: req.params.id }).then(() => {
+    res.status(200).json({
+      message: "Post deleted successfully"
+    });
+  })
 })
 
 module.exports = app;
