@@ -3,6 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { Post } from "./post.model";
 import { Subject } from 'rxjs'
 import { map } from 'rxjs/operators'
+import { ElementSchemaRegistry } from "@angular/compiler";
 @Injectable({providedIn: 'root'})
 export class PostsService{
   private posts:Post[] = [];
@@ -31,6 +32,10 @@ export class PostsService{
     return this.postsUpdated.asObservable();
   }
 
+  getPost(id: string) {
+    return this.httpClient.get<{_id: string, title: string, content: string}>('http://localhost:3000/api/posts/' + id)
+  }
+
   addPost(title: string, content: string) {
     const newPost: Post = {id: null, title: title, content: content}
 
@@ -40,6 +45,21 @@ export class PostsService{
       this.posts.push(newPost)
       this.postsUpdated.next([...this.posts])
     })
+  }
+
+  updatePost(id: string, title: string, content: string) {
+    const post: Post = {id: id, title: title, content: content}
+    this.httpClient.put<{id: string}>('http://localhost:3000/api/posts/' + id, post)
+    .subscribe(()=>{
+        const updatedPosts = [...this.posts]
+        updatedPosts.forEach((element, index) => {
+          if(element.id === id) {
+              updatedPosts[index] = post;
+          }
+        });
+        this.posts = updatedPosts
+        this.postsUpdated.next([...this.posts])
+      })
   }
 
   deletePost(id: string) {
