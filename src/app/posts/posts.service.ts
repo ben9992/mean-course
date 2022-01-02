@@ -4,12 +4,13 @@ import { Post } from "./post.model";
 import { Subject } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { ElementSchemaRegistry } from "@angular/compiler";
+import { Router } from "@angular/router";
 @Injectable({providedIn: 'root'})
 export class PostsService{
   private posts:Post[] = [];
   private postsUpdated = new Subject<Post[]>();
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient, private router: Router) {}
 
   getPosts() {
     this.httpClient.get<any>('http://localhost:3000/api/posts')
@@ -44,6 +45,7 @@ export class PostsService{
       newPost.id = data.postId
       this.posts.push(newPost)
       this.postsUpdated.next([...this.posts])
+      this.router.navigate(["/"])
     })
   }
 
@@ -59,6 +61,7 @@ export class PostsService{
         });
         this.posts = updatedPosts
         this.postsUpdated.next([...this.posts])
+        this.router.navigate(["/"])
       })
   }
 
