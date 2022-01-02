@@ -17,10 +17,14 @@ input[type="file"] {
 }
 
 .image-preview {
-  height: 3rem;
+  height: 8rem;
   margin: 1rem 0;
 }
 
 .image-preview img {
   height: 100%;
+}
+
+.spacer {
+  height: 6rem;
 }
