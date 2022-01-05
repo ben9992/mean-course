@@ -3,7 +3,6 @@ import { HttpClient } from "@angular/common/http";
 import { Post } from "./post.model";
 import { Subject } from 'rxjs'
 import { map } from 'rxjs/operators'
-import { ElementSchemaRegistry } from "@angular/compiler";
 import { Router } from "@angular/router";
 @Injectable({providedIn: 'root'})
 export class PostsService{
@@ -19,7 +18,8 @@ export class PostsService{
         return {
           title: post.title,
           content: post.content,
-          id: post._id
+          id: post._id,
+          imagePath: post.imagePath
         }
       });
     }))
@@ -34,18 +34,23 @@ export class PostsService{
   }
 
   getPost(id: string) {
-    return this.httpClient.get<{_id: string, title: string, content: string}>('http://localhost:3000/api/posts/' + id)
+    return this.httpClient.get<{_id: string, title: string, content: string, imagePath: string}>('http://localhost:3000/api/posts/' + id)
   }
 
   addPost(title: string, content: string, image: File) {
-    const postData = new FormData(); //Post = {id: null, title: title, content: content}
+    const postData = new FormData();
     postData.append("title", title);
     postData.append("content", content);
     postData.append("image", image, title);
-    this.httpClient.post<{messeage: string, postId: string}>('http://localhost:3000/api/posts', postData)
+    this.httpClient.post<{messeage: string, post: Post}>('http://localhost:3000/api/posts', postData)
     .subscribe(data=>{
-      const post: Post = {id: data.postId, title: title, content: content}
-      post.id = data.postId
+      const post: Post = {
+        id: data.post.id,
+        title: title,
+        content: content,
+        imagePath: data.post.imagePath
+      }
+      post.id = data.post.id
       this.posts.push(post)
       this.postsUpdated.next([...this.posts])
       this.router.navigate(["/"])
@@ -53,7 +58,7 @@ export class PostsService{
   }
 
   updatePost(id: string, title: string, content: string) {
-    const post: Post = {id: id, title: title, content: content}
+    const post: Post = {id: id, title: title, content: content, imagePath: null}
     this.httpClient.put<{id: string}>('http://localhost:3000/api/posts/' + id, post)
     .subscribe(()=>{
         const updatedPosts = [...this.posts]
