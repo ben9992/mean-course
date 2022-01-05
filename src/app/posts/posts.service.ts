@@ -57,11 +57,31 @@ export class PostsService{
     })
   }
 
-  updatePost(id: string, title: string, content: string) {
-    const post: Post = {id: id, title: title, content: content, imagePath: null}
-    this.httpClient.put<{id: string}>('http://localhost:3000/api/posts/' + id, post)
-    .subscribe(()=>{
+  updatePost(id: string, title: string, content: string, image: File | string) {
+    let postData: Post | FormData
+    if(typeof(image) === 'object') {
+      postData = new FormData()
+      postData.append("id", id)
+      postData.append("title", title)
+      postData.append("content", content)
+      postData.append("image", image, title)
+    } else {
+      postData = {
+        id: id,
+        title: title,
+        content: content,
+        imagePath: image
+      }
+    }
+    this.httpClient.put('http://localhost:3000/api/posts/' + id, postData)
+    .subscribe(response => {
         const updatedPosts = [...this.posts]
+        const post: Post = {
+          id: id,
+          title: title,
+          content: content,
+          imagePath: ""//response.imagePath
+      }
         updatedPosts.forEach((element, index) => {
           if(element.id === id) {
               updatedPosts[index] = post;
