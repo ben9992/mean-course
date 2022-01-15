@@ -101,7 +101,7 @@ export class AuthService{
     this.clearAuthData();
     this.isAuthenticated = false;
     this.authStatusListener.next(false);
-    this.router.navigate(["/"]);
+    this.router.navigate(["/auth/login"]);
   }
 
   private saveAuthData(token: string, expirationDate: Date, userId: string){
