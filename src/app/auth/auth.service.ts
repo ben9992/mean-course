@@ -34,9 +34,12 @@ export class AuthService{
       email: email,
       password: password
     }
-    this.httpClient.post('http://localhost:3000/api/user/signup', authData)
-    .subscribe(data=>{
-      this.router.navigate(["/"])
+    return this.httpClient.post('http://localhost:3000/api/user/signup', authData)
+    .subscribe({
+      next: () => {
+        this.login(authData.email, authData.password)
+      },
+      error: () => this.authStatusListener.next(false)
     })
   }
 
@@ -46,19 +49,22 @@ export class AuthService{
       password: password
     }
     this.httpClient.post<{token: string, expiresIn: number, userId: string}>('http://localhost:3000/api/user/login', authData)
-    .subscribe(data=>{
-      this.token = data.token
-      if(this.token) {
-        const expiresInDurInMili = data.expiresIn * 1000
-        this.userId = data.userId;
-        this.createTimer(expiresInDurInMili);
-        this.isAuthenticated = true;
-        this.authStatusListener.next(true)
-        const now = new Date();
-        const expirationDate = new Date(now.getTime() + expiresInDurInMili)
-        this.saveAuthData(this.token, expirationDate, this.userId)
-        this.router.navigate(["/"])
-      }
+    .subscribe({
+      next: data => {
+        this.token = data.token
+        if(this.token) {
+          const expiresInDurInMili = data.expiresIn * 1000
+          this.userId = data.userId;
+          this.createTimer(expiresInDurInMili);
+          this.isAuthenticated = true;
+          this.authStatusListener.next(true)
+          const now = new Date();
+          const expirationDate = new Date(now.getTime() + expiresInDurInMili)
+          this.saveAuthData(this.token, expirationDate, this.userId)
+          this.router.navigate(["/"])
+        }
+      },
+      error: () => this.authStatusListener.next(false)
     })
   }
 
@@ -103,6 +109,7 @@ export class AuthService{
     localStorage.setItem('userId', userId);
     localStorage.setItem('expiration', expirationDate.toISOString());
   }
+
   private clearAuthData(){
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
