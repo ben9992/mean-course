@@ -1,0 +1,6 @@
+{
+  "env": {
+    "MONGO_CONNECTION_STRING": "mongodb://localhost:27017/mean?retryWrites=true",
+    "JWT_TOKEN": "secret_this_should_be_longer"
+  }
+}

@@ -9,7 +9,7 @@ const app = express();
 
 mongoose
   .connect(
-    "mongodb://localhost:27017/mean?retryWrites=true"
+    process.env.MONGO_CONNECTION_STRING
   )
   .then(() => {
     console.log("Connected to database!");

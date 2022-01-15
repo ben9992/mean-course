@@ -4,6 +4,9 @@ import { Post } from "./post.model";
 import { Subject } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { Router } from "@angular/router";
+import { environment } from "src/environments/environment";
+
+const postUrl = environment.baseApiUrl + "/posts/"
 @Injectable({providedIn: 'root'})
 export class PostsService{
   private posts:Post[] = [];
@@ -13,7 +16,7 @@ export class PostsService{
 
   getPosts(postsPerPage: number, currentPage: number) {
     const queryParams = `?pagesize=${postsPerPage}&page=${currentPage}`
-    this.httpClient.get<{posts:any, maxPosts: number}>('http://localhost:3000/api/posts' + queryParams)
+    this.httpClient.get<{posts:any, maxPosts: number}>(postUrl + queryParams)
     .pipe(map((postData) => {
       return { posts: postData.posts.map(post => {
         return {
@@ -47,7 +50,7 @@ export class PostsService{
     postData.append("title", title);
     postData.append("content", content);
     postData.append("image", image, title);
-    this.httpClient.post<{messeage: string, post: Post}>('http://localhost:3000/api/posts', postData)
+    this.httpClient.post<{messeage: string, post: Post}>(postUrl, postData)
     .subscribe(data=>{
       this.router.navigate(["/"])
     })
@@ -70,13 +73,13 @@ export class PostsService{
         creator: null
       }
     }
-    this.httpClient.put('http://localhost:3000/api/posts/' + id, postData)
+    this.httpClient.put(postUrl + id, postData)
     .subscribe(response => {
         this.router.navigate(["/"])
       })
   }
 
   deletePost(id: string) {
-    return this.httpClient.delete<{id: string}>('http://localhost:3000/api/posts/' + id)
+    return this.httpClient.delete<{id: string}>(postUrl + id)
   }
 }

@@ -2,7 +2,11 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
 import { Subject } from "rxjs";
+import { environment } from "src/environments/environment";
 import { AuthData } from './auth-data.model'
+
+const authApi = environment.baseApiUrl + "/user"
+
 @Injectable({providedIn: 'root'})
 export class AuthService{
   private token: string;
@@ -34,7 +38,7 @@ export class AuthService{
       email: email,
       password: password
     }
-    return this.httpClient.post('http://localhost:3000/api/user/signup', authData)
+    return this.httpClient.post(authApi + '/signup/', authData)
     .subscribe({
       next: () => {
         this.login(authData.email, authData.password)
@@ -48,7 +52,7 @@ export class AuthService{
       email: email,
       password: password
     }
-    this.httpClient.post<{token: string, expiresIn: number, userId: string}>('http://localhost:3000/api/user/login', authData)
+    this.httpClient.post<{token: string, expiresIn: number, userId: string}>(authApi + '/login', authData)
     .subscribe({
       next: data => {
         this.token = data.token
